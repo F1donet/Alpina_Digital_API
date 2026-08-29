@@ -36,6 +36,8 @@ jiter==0.16.0
     # via openai
 openai==3.1.0
     # via -r requirements.in
+psycopg2-binary==2.9.12
+    # via -r requirements.in
 pydantic==2.13.4
     # via openai
 pydantic-core==2.46.4
