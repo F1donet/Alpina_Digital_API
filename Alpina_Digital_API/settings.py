@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'Alpina_Digital_API.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": 'django.db.backends.postgresql',
-        "HOST": "postgres",
+        "HOST": "stt_pgdb",
         "PORT": '5432',
         "NAME": "postgres",
         "USER": "postgres",
