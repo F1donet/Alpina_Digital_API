@@ -2,3 +2,4 @@ Django==6.1
 djangorestframework
 openai
 python-dotenv
+psycopg2-binary

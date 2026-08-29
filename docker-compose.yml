@@ -1,0 +1,73 @@
+services:
+  stt_django:
+    image: ghcr.io/F1donet/Alpina_Digital_API:latest
+    container_name: stt_django
+    env_file:
+      - .env
+    volumes:
+      - ./media:/app/media
+      - ./static:/app/static
+    ports:
+      - "8000:8000"
+    depends_on:
+      - stt_pgdb
+    networks:
+      - backend
+
+  stt_celery:
+    image: ghcr.io/F1donet/Alpina_Digital_API:latest
+    command: celery -A config worker --loglevel=info --concurrency=2
+    container_name: stt_celery
+    env_file:
+      - .env
+    volumes:
+      - ./media:/app/media
+    depends_on:
+      - stt_django
+
+  stt_celery_beat:
+    image: ghcr.io/F1donet/Alpina_Digital_API:latest
+    command: celery -A config beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    container_name: stt_celery_beat
+    env_file:
+      - .env
+    depends_on:
+      - stt_django
+      - stt_pgdb
+    networks:
+      - backend
+
+  stt_pgdb:
+    image: postgres
+    container_name: app-postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: stt_django
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-U", "postgres"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+    networks:
+      - backend
+
+  stt_redis:
+    image: redis
+    container_name: stt_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+
+volumes:
+  pgdata:
+
+networks:
+  backend:
+    name: backend
+    driver: bridge
